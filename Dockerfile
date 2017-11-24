@@ -18,7 +18,7 @@ RUN git config --global user.email "ondrej.popelka@keboola.com" \
 	&& git config --global user.name "Robot Robotic" \
 	&& git config --global push.default simple
 
-COPY ./config /home/root/.ssh/config
+COPY ./config /root/.ssh/config
 COPY . /code/
 WORKDIR /code/
 RUN composer install --no-interaction
