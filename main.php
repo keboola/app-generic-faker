@@ -17,8 +17,8 @@ $pass = $config['image_parameters']['#pass'];
 file_put_contents('/root/pass', $pass);
 exec('echo ' . escapeshellarg($key) . ' > /root/.ssh/id_rsa');
 exec('chmod 0400 /root/.ssh/id_rsa');
-//exec('eval $(ssh-agent -s)');
-//exec('./ssh-add-pass.sh /root/.ssh/id_rsa /root/pass');
+exec('eval $(ssh-agent -s)');
+exec('./ssh-add-pass.sh /root/.ssh/id_rsa /root/pass');
 
 $temp = new Temp();
 $temp->initRunFolder();
@@ -53,9 +53,10 @@ foreach ($config['storage']['input']['tables'] as $table) {
 }
 
 echo "Pushing\n";
+chdir($temp->getTmpFolder());
 exec('git add .');
 $message = "Update: " . (new DateTime())->format('Y-M-D H:i');
 exec('git commit -a -m ' . escapeshellarg($message));
-exec('git push');
-sleep(100000000);
+//exec('git push');
+//sleep(100000000);
 echo "All done\n";
