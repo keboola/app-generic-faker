@@ -19,6 +19,7 @@ RUN git config --global user.email "ondrej.popelka@keboola.com" \
 	&& git config --global push.default simple
 
 COPY ./config /root/.ssh/config
+COPY ./known_hosts /root/.ssh/known_hosts
 COPY . /code/
 WORKDIR /code/
 RUN composer install --no-interaction

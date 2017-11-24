@@ -55,4 +55,5 @@ exec('git add .');
 $message = "Update: " . (new DateTime())->format('Y-M-D H:i');
 exec('git commit -a -m ' . escapeshellarg($message));
 exec('git push');
+sleep(100000000);
 echo "All done\n";
