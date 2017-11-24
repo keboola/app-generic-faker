@@ -14,9 +14,9 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 $repository = $config['image_parameters']['repository'];
 $key = $config['image_parameters']['#git_key'];
 $pass = $config['image_parameters']['#pass'];
-file_put_contents('/home/root/pass', $pass);
-exec('echo ' . escapeshellarg($key) . ' > /home/root/.ssh/git_key');
-exec('chmod 0400 /home/root/.ssh/git_key');
+file_put_contents('/root/pass', $pass);
+exec('echo ' . escapeshellarg($key) . ' > /root/.ssh/git_key');
+exec('chmod 0400 /root/.ssh/git_key');
 
 $temp = new Temp();
 $temp->initRunFolder();
