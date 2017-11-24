@@ -6,6 +6,7 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
+        expect \
         openssh-server \
         unzip \
     && rm -rf /var/lib/apt/lists/*
