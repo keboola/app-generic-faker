@@ -10,7 +10,7 @@ pass=$(cat $2)
 echo "Key added"
 expect << EOF
   spawn ssh-add $1
-  expect "Enter passphrase"
+  expect "Enter passphrase for key '/root/.ssh/git_key':"
   send "$pass\r"
   expect eof
 EOF

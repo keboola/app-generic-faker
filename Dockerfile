@@ -20,7 +20,14 @@ RUN git config --global user.email "ondrej.popelka@keboola.com" \
 	&& git config --global push.default simple
 
 COPY ./config /root/.ssh/config
-COPY ./known_hosts /root/.ssh/known_hosts
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+COPY ./key.pub /root/.ssh/key.pub
+
 COPY . /code/
 WORKDIR /code/
 RUN composer install --no-interaction

@@ -15,10 +15,10 @@ $repository = $config['image_parameters']['repository'];
 $key = $config['image_parameters']['#git_key'];
 $pass = $config['image_parameters']['#pass'];
 file_put_contents('/root/pass', $pass);
-exec('echo ' . escapeshellarg($key) . ' > /root/.ssh/git_key');
-exec('chmod 0400 /root/.ssh/git_key');
-exec('eval $(ssh-agent -s)');
-exec('./ssh-add-pass.sh /root/.ssh/git_key /root/pass');
+exec('echo ' . escapeshellarg($key) . ' > /root/.ssh/id_rsa');
+exec('chmod 0400 /root/.ssh/id_rsa');
+//exec('eval $(ssh-agent -s)');
+//exec('./ssh-add-pass.sh /root/.ssh/id_rsa /root/pass');
 
 $temp = new Temp();
 $temp->initRunFolder();
