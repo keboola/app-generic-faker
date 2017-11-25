@@ -4,7 +4,7 @@ require 'vendor/autoload.php';
 
 use Keboola\Temp\Temp;
 
-echo "Initializing\n";
+echo "\nInitializing\n";
 $dataDir = getenv('KBC_DATADIR') === false ? '/data' : getenv('KBC_DATADIR');
 $configFile = $dataDir . DIRECTORY_SEPARATOR . 'config.json';
 $config = json_decode(file_get_contents($configFile), true);
@@ -13,21 +13,17 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 $repository = $config['image_parameters']['repository'];
 $key = $config['image_parameters']['#git_key'];
-$pass = $config['image_parameters']['#pass'];
-file_put_contents('/root/pass', $pass);
-exec('echo ' . escapeshellarg($key) . ' > /root/.ssh/id_rsa');
-exec('chmod 0400 /root/.ssh/id_rsa');
-exec('eval $(ssh-agent -s)');
-exec('./ssh-add-pass.sh /root/.ssh/id_rsa /root/pass');
+passthru('echo ' . escapeshellarg($key) . ' > /root/.ssh/git_key');
+passthru('chmod 0400 /root/.ssh/git_key');
+passthru('eval $(ssh-agent -s)');
 
 $temp = new Temp();
 $temp->initRunFolder();
-#exec('eval $(ssh-agent -s)');
-#exec('ssh-add ~/.ssh/id_rsa');
-echo 'git clone ' . escapeshellarg($repository) . ' ' . $temp->getTmpFolder() . "\n";
-exec('git clone ' . escapeshellarg($repository) . ' ' . $temp->getTmpFolder());
+passthru('git clone ' . escapeshellarg($repository) . ' ' . $temp->getTmpFolder());
+mkdir($temp->getTmpFolder());
 
-echo "Generating JSON files\n";
+echo "\nGenerating JSON files\n";
+
 foreach ($config['storage']['input']['tables'] as $table) {
     $source = $dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'tables'
         . DIRECTORY_SEPARATOR . $table['destination'];
@@ -48,15 +44,16 @@ foreach ($config['storage']['input']['tables'] as $table) {
     $data['source'] = $source;
     $data['destination'] = $destination;
     $json = json_encode($data, JSON_PRETTY_PRINT);
-    file_put_contents($destination, $json);
-    echo "Saved $destination JSON file\n";
+    file_put_contents($destination . '.request', 'GET /' . $destination);
+    file_put_contents($destination . '.response', $json);
+    file_put_contents($destination . '.requestHeaders', 'Authorization: Basic Sm9obkRvZTpzZWNyZXQ=');
+    echo "\nSaved $destination JSON file\n";
 }
 
-echo "Pushing\n";
+echo "\nPushing\n";
 chdir($temp->getTmpFolder());
-exec('git add .');
+passthru('git add .');
 $message = "Update: " . (new DateTime())->format('Y-M-D H:i');
-exec('git commit -a -m ' . escapeshellarg($message));
-//exec('git push');
-//sleep(100000000);
-echo "All done\n";
+passthru('git commit -a -m ' . escapeshellarg($message));
+passthru('git push');
+echo "\nAll done\n";

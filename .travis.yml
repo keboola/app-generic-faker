@@ -5,6 +5,10 @@ services:
 
 script:
   - docker build --tag=app-generic-faker .
+  - git clone https://github.com/keboola/ex-generic-mock-server.git ./server/
+  - rmdir ./server/data/
+  - git clone https://github.com/keboola/app-generic-faker-data.git ./server/data/
+  - 
 
 deploy:
   provider: script

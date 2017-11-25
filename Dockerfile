@@ -6,7 +6,6 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
-        expect \
         openssh-server \
         unzip \
     && rm -rf /var/lib/apt/lists/*
@@ -25,8 +24,6 @@ COPY ./config /root/.ssh/config
 RUN mkdir -p /root/.ssh && \
     chmod 0700 /root/.ssh && \
     ssh-keyscan github.com > /root/.ssh/known_hosts
-
-COPY ./key.pub /root/.ssh/key.pub
 
 COPY . /code/
 WORKDIR /code/
