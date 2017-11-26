@@ -27,8 +27,9 @@ echo "\nGenerating JSON files\n";
 foreach ($config['storage']['input']['tables'] as $table) {
     $source = $dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'tables'
         . DIRECTORY_SEPARATOR . $table['destination'];
-    $destinationFile = $temp->getTmpFolder() . DIRECTORY_SEPARATOR . $table['destination'] .
-        DIRECTORY_SEPARATOR . $table['destination'];
+    $destinationDir = $temp->getTmpFolder() . DIRECTORY_SEPARATOR . $table['destination'];
+    mkdir($destinationDir);
+    $destinationFile = $destinationDir . DIRECTORY_SEPARATOR . $table['destination'];
     $csv = new \Keboola\Csv\CsvFile($source);
     $headers = $csv->getHeader();
     $data = [];
