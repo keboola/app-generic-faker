@@ -53,7 +53,7 @@ class Generator
         return $config;
     }
 
-    private function generateJSONFiles(array $tables, string $userName, string $password)
+    private function generateJSONFiles(array $tables, string $userName, string $password, int $pageSize)
     {
         $sourceDir = $source = $this->getDataDir() . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'tables' . DIRECTORY_SEPARATOR;
         $destinationDir = $this->temp->getTmpFolder() . DIRECTORY_SEPARATOR;
@@ -67,6 +67,10 @@ class Generator
             $csv = new CsvFile($sourceFile);
             $headers = $csv->getHeader();
             $data = [];
+            $data['source'] = $table['source'];
+            $data['destination'] = $table['destination'];
+            $data['page']['last'] = false;
+            $page = 1;
             foreach ($csv as $rowIndex => $row) {
                 if ($rowIndex == 0) {
                     continue;
@@ -76,17 +80,28 @@ class Generator
                     $item[$column] = $row[$index];
                 }
                 $data['items'][] = $item;
+                if (count($data['items']) >= $pageSize) {
+                    $data['page']['number'] = $page;
+                    $this->saveData($data, $destinationFile, $userName, $password, $table['destination']);
+                    $data['items'] = [];
+                    $page++;
+                }
             }
-            $data['source'] = $table['source'];
-            $data['destination'] = $table['destination'];
-            $json = json_encode($data, JSON_PRETTY_PRINT);
-            $targetUrl = str_replace('.', '/', $table['destination']);
-            file_put_contents($destinationFile . '.request', 'GET /' . $targetUrl);
-            file_put_contents($destinationFile . '.response', $json);
-            $auth = base64_encode($userName . ':' . $password);
-            file_put_contents($destinationFile . '.requestHeaders', 'Authorization: Basic ' . $auth);
-            $this->logger->info("Saved $destinationFile request, response and requestHeaders files.");
+            $data['page']['last'] = true;
+            $this->saveData($data, $destinationFile, $userName, $password, $table['destination']);
         }
+    }
+
+    private function saveData(array $data, string $destinationFile, string $userName, string $password, string $address)
+    {
+        $baseName = $destinationFile . '-' . $data['page']['number'];
+        $json = json_encode($data, JSON_PRETTY_PRINT);
+        $targetUrl = str_replace('.', '/', $address);
+        file_put_contents($baseName . '.request', 'GET /' . $targetUrl . '?page=' . $data['page']['number']);
+        file_put_contents($baseName . '.response', $json);
+        $auth = base64_encode($userName . ':' . $password);
+        file_put_contents($baseName . '.requestHeaders', 'Authorization: Basic ' . $auth);
+        $this->logger->info("Saved $baseName request, response and requestHeaders files.");
     }
 
     private function pullData(string $repository, string $key)
@@ -112,7 +127,12 @@ class Generator
     {
         $config = $this->processConfigFile();
         $this->pullData($config['image_parameters']['repository'], $config['image_parameters']['#git_key']);
-        $this->generateJSONFiles($config['storage']['input']['tables'], $config['parameters']['username'], $config['parameters']['#password']);
+        $this->generateJSONFiles(
+            $config['storage']['input']['tables'],
+            $config['parameters']['username'],
+            $config['parameters']['#password'],
+            100
+        );
         $this->pushData();
         $this->logger->debug("All done");
     }

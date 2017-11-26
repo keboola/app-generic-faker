@@ -15,7 +15,10 @@ set_error_handler("exception_error_handler");
 // initialize logger
 $logger = new Monolog\Logger("logger");
 $stream = fopen('php://stderr', 'r');
-$logger->pushHandler(new \Monolog\Handler\StreamHandler($stream));
+$formatter = new \Monolog\Formatter\LineFormatter("%level_name%: %message%\n");
+$streamHandler = new \Monolog\Handler\StreamHandler($stream);
+$streamHandler->setFormatter($formatter);
+$logger->pushHandler($streamHandler);
 $logger->info("Initializing");
 
 // run application
@@ -26,6 +29,6 @@ try {
     $logger->error($e->getMessage(), ['exception' => $e]);
     exit(1);
 } catch (\Exception $e) {
-    $logger->error('Application error has occurred.', ['exception' => $e]);
+    $logger->error('Application error has occurred: ' . $e->getMessage(), ['exception' => $e]);
     exit(2);
 }
