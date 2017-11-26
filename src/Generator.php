@@ -87,6 +87,7 @@ class Generator
                     $page++;
                 }
             }
+            $data['page']['number'] = $page;
             $data['page']['last'] = true;
             $this->saveData($data, $destinationFile, $userName, $password, $table['destination']);
         }
