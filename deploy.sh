@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-Obtain the application repository and log in
-docker pull quay.io/keboola/developer-portal-cli-v2:latest
+#Obtain the application repository and log in
+#docker pull quay.io/keboola/developer-portal-cli-v2:latest
 export REPOSITORY=`docker run --rm  \
     -e KBC_DEVELOPERPORTAL_USERNAME \
     -e KBC_DEVELOPERPORTAL_PASSWORD \
