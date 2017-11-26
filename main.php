@@ -27,7 +27,8 @@ echo "\nGenerating JSON files\n";
 foreach ($config['storage']['input']['tables'] as $table) {
     $source = $dataDir . DIRECTORY_SEPARATOR . 'in' . DIRECTORY_SEPARATOR . 'tables'
         . DIRECTORY_SEPARATOR . $table['destination'];
-    $destination = $temp->getTmpFolder() . DIRECTORY_SEPARATOR . $table['destination'];
+    $destinationFile = $temp->getTmpFolder() . DIRECTORY_SEPARATOR . $table['destination'] .
+        DIRECTORY_SEPARATOR . $table['destination'];
     $csv = new \Keboola\Csv\CsvFile($source);
     $headers = $csv->getHeader();
     $data = [];
@@ -42,12 +43,12 @@ foreach ($config['storage']['input']['tables'] as $table) {
         $data['items'][] = $item;
     }
     $data['source'] = $source;
-    $data['destination'] = $destination;
+    $data['destination'] = $table['destination'];
     $json = json_encode($data, JSON_PRETTY_PRINT);
-    file_put_contents($destination . '.request', 'GET /' . $destination);
-    file_put_contents($destination . '.response', $json);
-    file_put_contents($destination . '.requestHeaders', 'Authorization: Basic Sm9obkRvZTpzZWNyZXQ=');
-    echo "\nSaved $destination JSON file\n";
+    file_put_contents($destinationFile . '.request', 'GET /' . $table['destination']);
+    file_put_contents($destinationFile . '.response', $json);
+    file_put_contents($destinationFile . '.requestHeaders', 'Authorization: Basic Sm9obkRvZTpzZWNyZXQ=');
+    echo "\nSaved $destinationFile JSON files.\n";
 }
 
 echo "\nPushing\n";
