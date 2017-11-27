@@ -1,0 +1,21 @@
+version: '2'
+services:
+  app-generic-faker:
+    build: .
+    image: keboola/app-generic-faker
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./data/:/data/      
+  app-generic-faker-dev:
+    build: .
+    image: keboola/app-generic-faker
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/code/
+      - ./data/:/data/
+    command: 
+      - /bin/bash
+      - -c
+      - 'composer install --no-interaction && php /code/main.php'
