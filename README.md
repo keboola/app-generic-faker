@@ -9,7 +9,7 @@ e.g.:
 - `coords` (`/data/in/tables/coords`) -- will be available at `/coords/`
 - `location.coords` (`/data/in/tables/location.coords`) -- will be available at `/location/coords/`
 
-![https://github.com/keboola/app-generic-faker/blob/master/doc/configuration.png]
+![Screenshot - Configuration](https://github.com/keboola/app-generic-faker/blob/master/doc/configuration.png)
 
 Configuration accepts credentials required for HTTP authentication of mock server requests:
 
