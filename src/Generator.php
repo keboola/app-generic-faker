@@ -49,6 +49,9 @@ class Generator
         }
         $config['parameters']['username'] = $config['parameters']['username'] ?? 'JohnDoe';
         $config['parameters']['#password'] = $config['parameters']['#password'] ?? 'secret';
+        if (empty($config['parameters']['pageSize']) || empty(intval($config['parameters']['pageSize']))) {
+            $config['parameters']['pageSize'] = 1000;
+        }
         $this->logger->info("Config file ok.");
         return $config;
     }
@@ -69,7 +72,7 @@ class Generator
             $data = [];
             $data['source'] = $table['source'];
             $data['destination'] = $table['destination'];
-            $data['page']['last'] = false;
+            $data['lastPage'] = false;
             $page = 1;
             foreach ($csv as $rowIndex => $row) {
                 if ($rowIndex == 0) {
@@ -81,24 +84,24 @@ class Generator
                 }
                 $data['items'][] = $item;
                 if (count($data['items']) >= $pageSize) {
-                    $data['page']['number'] = $page;
+                    $data['pageNumber'] = $page;
                     $this->saveData($data, $destinationFile, $userName, $password, $table['destination']);
                     $data['items'] = [];
                     $page++;
                 }
             }
-            $data['page']['number'] = $page;
-            $data['page']['last'] = true;
+            $data['pageNumber'] = $page;
+            $data['lastPage'] = true;
             $this->saveData($data, $destinationFile, $userName, $password, $table['destination']);
         }
     }
 
     private function saveData(array $data, string $destinationFile, string $userName, string $password, string $address)
     {
-        $baseName = $destinationFile . '-' . $data['page']['number'];
+        $baseName = $destinationFile . '-' . $data['pageNumber'];
         $json = json_encode($data, JSON_PRETTY_PRINT);
         $targetUrl = str_replace('.', '/', $address);
-        file_put_contents($baseName . '.request', 'GET /' . $targetUrl . '?page=' . $data['page']['number']);
+        file_put_contents($baseName . '.request', 'GET /' . $targetUrl . '?page=' . $data['pageNumber']);
         file_put_contents($baseName . '.response', $json);
         $auth = base64_encode($userName . ':' . $password);
         file_put_contents($baseName . '.requestHeaders', 'Authorization: Basic ' . $auth);
@@ -132,7 +135,7 @@ class Generator
             $config['storage']['input']['tables'],
             $config['parameters']['username'],
             $config['parameters']['#password'],
-            100
+            $config['parameters']['pageSize']
         );
         $this->pushData();
         $this->logger->debug("All done");
